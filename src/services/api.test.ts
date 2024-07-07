@@ -3,7 +3,6 @@ import { http, HttpResponse } from 'msw'
 import { setupServer } from 'msw/node'
 import { getDataFromApi } from './api'
 
-// Создаем мок-сервер
 const server = setupServer(
   http.get('https://swapi.dev/api/planets', () => {
     return HttpResponse.json({
@@ -27,13 +26,10 @@ const server = setupServer(
   }),
 )
 
-// Настраиваем сервер перед всеми тестами
 beforeAll(() => server.listen())
 
-// Останавливаем сервер после каждого теста
 afterEach(() => server.resetHandlers())
 
-// Закрываем сервер после завершения всех тестов
 afterAll(() => server.close())
 
 describe('getDataFromApi', () => {
