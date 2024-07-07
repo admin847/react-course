@@ -1,0 +1,11 @@
+.search-form {
+  display: flex;
+  gap: 10px;
+}
+
+.search-form__input {
+  flex-grow: 1;
+  border-radius: 8px;
+  padding: 8px 20px;
+  border: none;
+}

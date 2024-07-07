@@ -1,0 +1,16 @@
+.main-page {
+    max-width: 1200px;
+    margin-inline: auto;
+}
+
+.main-page__header {
+    padding-bottom: 50px;
+}
+
+.planet-list {
+    margin: 0;
+    padding: 0;
+    > * {
+        margin-bottom: 20px;
+    }
+}
