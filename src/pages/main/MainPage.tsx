@@ -9,8 +9,7 @@ interface IState {
   searchQuery: string
   planets: IPlanet[]
   loading: boolean
-  searchPlanets: () => Promise<void>
-  searchFromHandler: (e: React.FormEvent) => Promise<void>
+  error: boolean
 }
 
 class MainPage extends Component {
@@ -18,31 +17,42 @@ class MainPage extends Component {
     searchQuery: localStorage.getItem('searchQuery') || '',
     planets: [],
     loading: false,
-    searchPlanets: async () => {
-      try {
-        this.setState({ loading: true })
-        const res = await getDataFromApi(this.state.searchQuery)
-        this.setState({
-          planets: res.results,
-        })
-      } catch (e) {
-        this.state.planets = []
-      } finally {
-        this.setState({ loading: false })
-      }
-    },
-    searchFromHandler: async (e: React.FormEvent) => {
-      e.preventDefault()
-      localStorage.setItem('searchQuery', this.state.searchQuery)
-      await this.state.searchPlanets()
-    },
+    error: false,
+  }
+
+  searchPlanets = async () => {
+    try {
+      this.setState({ loading: true })
+      const res = await getDataFromApi(this.state.searchQuery)
+      this.setState({
+        planets: res.results,
+      })
+    } catch (e) {
+      this.state.planets = []
+    } finally {
+      this.setState({ loading: false })
+    }
+  }
+
+  searchFromHandler = async (e: React.FormEvent) => {
+    e.preventDefault()
+    localStorage.setItem('searchQuery', this.state.searchQuery)
+    await this.searchPlanets()
+  }
+
+  throwError = () => {
+    this.setState({ error: true })
   }
 
   async componentDidMount() {
-    await this.state.searchPlanets()
+    await this.searchPlanets()
   }
 
   render() {
+    if (this.state.error) {
+      throw new Error('Error')
+    }
+
     return (
       <div className="main-page">
         <header className="main-page__header">
@@ -51,21 +61,29 @@ class MainPage extends Component {
             setSearchString={(value: string) =>
               this.setState({ searchQuery: value })
             }
-            formHandler={this.state.searchFromHandler}
+            formHandler={this.searchFromHandler}
           />
         </header>
+
         <main className="main-page__body">
-          {this.state.loading && <div>Loading...</div>}
-          <ul className="planet-list">
-            {this.state.planets.length && !this.state.loading ? (
-              this.state.planets.map((planet) => (
-                <PlanetCard key={planet.url} name={planet.name} />
-              ))
-            ) : (
-              <div>No results found</div>
-            )}
-          </ul>
+          {this.state.loading ? (
+            <div>Loading...</div>
+          ) : (
+            <ul className="planet-list">
+              {this.state.planets?.length ? (
+                this.state.planets.map((planet) => (
+                  <PlanetCard key={planet.url} name={planet.name} />
+                ))
+              ) : (
+                <div>No results found</div>
+              )}
+            </ul>
+          )}
         </main>
+
+        <div className="p-20">
+          <button onClick={this.throwError}>Test for a rendering error</button>
+        </div>
       </div>
     )
   }

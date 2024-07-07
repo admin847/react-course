@@ -15,7 +15,7 @@ class SearchForm extends Component<IProps> {
         onSubmit={(e: React.FormEvent) => this.props.formHandler(e)}
       >
         <input
-          type="text"
+          type="search"
           className="search-form__input"
           placeholder="Search..."
           value={this.props.searchString}
